@@ -17,7 +17,7 @@ This will compile the example program contained in the file `sst19_example_june2
 The executable can then be run on Unix systems using `./sst19_example_june2023`. The output of this program should produce:
 
 >    shielding coefficients have been stored\
-  External field evaluated at: (xGSM,yGSM,zGSM)=  -5.0000000000000000        4.2000000000000002        1.2000000000000000   \  
+  External field evaluated at: (xGSM,yGSM,zGSM)=  -5.0000000000000000        4.2000000000000002        1.2000000000000000     \
   Expected:  (bxGSM,byGSM,bzGSM)=   16.702390096106559       -13.306583526317164       -36.650180176716844       nT\
   Evaluated: (bxGSM,byGSM,bzGSM)=   16.702390096106559       -13.306583526317164       -36.650180176716844       nT
 
