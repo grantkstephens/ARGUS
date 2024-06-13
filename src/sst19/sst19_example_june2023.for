@@ -1,3 +1,6 @@
+!
+!© 2003 The Johns Hopkins University Applied Physics Laboratory LLC
+!
 !===============================================================================
 ! June 2023: G.K.Stephens (Grant.Stephens@jhuapl.edu)
 ! This program demonstrates how to setup and evaluate the Stephens et al. (2019)
