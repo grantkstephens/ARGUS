@@ -1,5 +1,5 @@
 # ARGUS
-The FORTRAN source code for the Stephens et al. (2019) empirical geomagnetic field model, termed SST19, (https://doi.org/10.1029/2018JA025843). The architecture of SST19 extends that of the TS07D model (https://doi.org/10.1029/2007JA013003), which was the first data mining-based algorithm (https://doi.org/10.1029/2007JA013003) for reconstructing the magnetospheric geomagnetic field. SST19 and TS07D owe their heritage to the many Tsyganenko geomagnetic field models (https://geo.phys.spbu.ru/~tsyganenko/empirical-models/).
+The FORTRAN source code for the Stephens et al. (2019) empirical geomagnetic field model, termed SST19, (https://doi.org/10.1029/2018JA025843). The architecture of SST19 extends that of the TS07D model (https://doi.org/10.1029/2007JA012260), which was the first data mining-based algorithm (https://doi.org/10.1029/2007JA013003) for reconstructing the magnetospheric geomagnetic field. SST19 and TS07D owe their heritage to the many Tsyganenko geomagnetic field models (https://geo.phys.spbu.ru/~tsyganenko/empirical-models/).
 
 <img src="docs/substorm3d.jpeg" width="300">
 
