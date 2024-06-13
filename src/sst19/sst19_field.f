@@ -1,3 +1,6 @@
+!
+!© 2003 The Johns Hopkins University Applied Physics Laboratory LLC
+!
       subroutine store_sst19_static(staticDir)
 
       IMPLICIT NONE
