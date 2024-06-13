@@ -1,3 +1,6 @@
+!
+!© 2003 The Johns Hopkins University Applied Physics Laboratory LLC
+!
 !======================================================================================================
 ! July 2017: G.K.Stephens (Grant.Stephens@jhuapl.edu)
 ! This program demonstrates how to setup and evaluate the Tsyganenko and Sitnov [2007] (TS07D)
