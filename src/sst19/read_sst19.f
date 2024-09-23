@@ -1,3 +1,6 @@
+!
+!© 2023 The Johns Hopkins University Applied Physics Laboratory LLC
+!
       subroutine read_sst19_static(staticDir,
      .     TSS,TSO,TSE)
 
