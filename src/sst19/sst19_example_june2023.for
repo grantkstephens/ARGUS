@@ -30,6 +30,12 @@
 !
 ! ./sst19_example_june2023
 !
+!
+! List of updates:
+!
+! November 2024: The source code was modified to allow for the evaluation of the
+! the current density vector. New subroutines and entry points were added to
+! the sst19_field.f file.
 !===============================================================================
       PROGRAM SST19
       
@@ -51,9 +57,10 @@ c     change the time.
 c     Inputs to the model
       REAL*8 xGSM,yGSM,zGSM      
 
-c     Output parameters for TS07D model
+c     Output parameters for SST19 model
       REAL*8 bxGSM,byGSM,bzGSM
-
+      REAL*8 jxGSM,jyGSM,jzGSM
+      
 c     TODO: change the below to paths to your local paths
 c     staticDir is the directory that contains the static shielding coefficients
       CHARACTER*256 staticDir
@@ -122,5 +129,19 @@ c     times.
       PRINT *,' Evaluated: (bxGSM,byGSM,bzGSM)=',bxGSM,byGSM,bzGSM,' nT'
       PRINT *,' '
 
+
+c     Now evaluate the SST19 current density. This routine can be called any
+c     number of times.
+      call sst19_current(xGSM,yGSM,zGSM, jxGSM,jyGSM,jzGSM)
+      
+      PRINT *,' External current density evaluated at: '//
+     .     '(xGSM,yGSM,zGSM)=', xGSM,yGSM,zGSM
+      PRINT *,' Expected:  (jxGSM,jyGSM,jzGSM)='//
+     .     '   1.2398720111688109       0.65773718723264352'//
+     .     '       0.15564119918521516       nA/m^2'
+      PRINT *,' Evaluated: (jxGSM,jyGSM,jzGSM)=',jxGSM,jyGSM,jzGSM,
+     .     ' nA/m^2'
+      PRINT *,' '
+      
 c     The program is complete
       END
