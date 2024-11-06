@@ -1,3 +1,6 @@
+!
+!© 2003 The Johns Hopkins University Applied Physics Laboratory LLC
+!
 c %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 C
       SUBROUTINE fac_total_sst19 (xKappa1,xKappa2,
