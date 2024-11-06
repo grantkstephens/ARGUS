@@ -15,6 +15,9 @@ C     Constants
       INTEGER    Mend,Nend
       PARAMETER (Mend = 6)
       PARAMETER (Nend = 8)
+      REAL*8     RE,mu0
+      PARAMETER (RE = 6371.2d0)
+      PARAMETER (mu0 = 1.25663706127E-6)
       
 C     Internal variables
 C     time-static variables
@@ -59,7 +62,8 @@ C     Inputs
       REAL*8 x,y,z
 
 c     Outputs
-      REAL*8 bx,by,bz      
+      REAL*8 bx,by,bz
+      REAL*8 jx,jy,jz
 
 c     Internal variables
       REAL*8  BXCF,BYCF,BZCF
@@ -85,6 +89,16 @@ c     Internal variables
       REAL*8  BX22a,BY22a,BZ22a
       REAL*8  BX21s,BY21s,BZ21s
       REAL*8  BX22s,BY22s,BZ22s
+c     Internal variables for current
+      REAL*8  dr,Acurr
+      REAL*8  xp,yp,zp
+      REAL*8  xm,ym,zm
+      REAL*8  bx_xp,by_xp,bz_xp
+      REAL*8  bx_xm,by_xm,bz_xm
+      REAL*8  bx_yp,by_yp,bz_yp
+      REAL*8  bx_ym,by_ym,bz_ym
+      REAL*8  bx_zp,by_zp,bz_zp
+      REAL*8  bx_zm,by_zm,bz_zm
       
       call read_sst19_static(staticDir,
      .     TSS,TSO,TSE)
@@ -133,7 +147,7 @@ c     check that the time-variable variables were loaded
      .        'must be stored first by calling store_sst19_variable'
       endif
       
-      call sst19_field_expansion(TSS,TSO,TSE,
+      call sst19_field_vect(TSS,TSO,TSE,
      .     A_dipsh, A_eq,A_eq_P, A_eq_TCS,A_eq_P_TCS,
      .     A_R11am,A_R12am,A_R11sm,A_R12sm,
      .     A_R11a, A_R12a, A_R11s, A_R12s,
@@ -141,25 +155,6 @@ c     check that the time-variable variables were loaded
      .     A_R21a, A_R22a, A_R21s, A_R22s,
      .     D,DTCS, RH0,G, xKappa1,xKappa2, TW,
      .     tiltIn,Pdyn,X,Y,Z,
-     .     BXCF,BYCF,BZCF,
-     .     BXTS1,BYTS1,BZTS1,BXTO1,BYTO1,BZTO1,BXTE1,BYTE1,BZTE1,
-     .     BXTS2,BYTS2,BZTS2,BXTO2,BYTO2,BZTO2,BXTE2,BYTE2,BZTE2,
-     .     BX11am,BY11am,BZ11am,
-     .     BX12am,BY12am,BZ12am,
-     .     BX11sm,BY11sm,BZ11sm,
-     .     BX12sm,BY12sm,BZ12sm,
-     .     BX11a,BY11a,BZ11a,
-     .     BX12a,BY12a,BZ12a,
-     .     BX11s,BY11s,BZ11s,
-     .     BX12s,BY12s,BZ12s,
-     .     BX21am,BY21am,BZ21am,
-     .     BX22am,BY22am,BZ22am,      
-     .     BX21sm,BY21sm,BZ21sm,
-     .     BX22sm,BY22sm,BZ22sm,      
-     .     BX21a,BY21a,BZ21a,
-     .     BX22a,BY22a,BZ22a,
-     .     BX21s,BY21s,BZ21s,
-     .     BX22s,BY22s,BZ22s,
      .     BX,BY,BZ)
       
       return
@@ -179,6 +174,171 @@ c     check that the time-variable variables were loaded
      .        'must be stored first by calling store_sst19_variable'
       endif
       
+      call sst19_field_vect(TSS,TSO,TSE,
+     .     A_dipsh, A_eq,A_eq_P, A_eq_TCS,A_eq_P_TCS,
+     .     A_R11am,A_R12am,A_R11sm,A_R12sm,
+     .     A_R11a, A_R12a, A_R11s, A_R12s,
+     .     A_R21am,A_R22am,A_R21sm,A_R22sm,
+     .     A_R21a, A_R22a, A_R21s, A_R22s,
+     .     D,DTCS, RH0,G, xKappa1,xKappa2, TW,
+     .     tilt,Pdyn,X,Y,Z,
+     .     BX,BY,BZ)
+      
+      return
+
+      
+      entry sst19_current(x,y,z, jx,jy,jz)
+      
+c     check that the static coefficients were loaded
+      if (init_static .eqv. .false.) then
+         stop 'the static shielding coefficients must be '//
+     .        'stored first by calling store_sst19_static'
+      endif      
+
+c     check that the time-variable variables were loaded
+      if (init_variable .eqv. .false.) then
+         stop 'the time-variable parameters and coefficients '//
+     .        'must be stored first by calling store_sst19_variable'
+      endif
+      
+      dr = 0.01d0
+
+c     converts to current density in units of nA/m^2
+      Acurr = 1.0d0/(2.0d0*dr)/(mu0*RE*1000.0d0)
+
+c     shift the input coord. by the finite difference
+      xp = x+dr
+      xm = x-dr
+      yp = y+dr
+      ym = y-dr
+      zp = z+dr
+      zm = z-dr
+
+c     evaluate the field at the displaced coords.
+      call sst19_field_vect(TSS,TSO,TSE,
+     .     A_dipsh, A_eq,A_eq_P, A_eq_TCS,A_eq_P_TCS,
+     .     A_R11am,A_R12am,A_R11sm,A_R12sm,
+     .     A_R11a, A_R12a, A_R11s, A_R12s,
+     .     A_R21am,A_R22am,A_R21sm,A_R22sm,
+     .     A_R21a, A_R22a, A_R21s, A_R22s,
+     .     D,DTCS, RH0,G, xKappa1,xKappa2, TW,
+     .     tilt,Pdyn,xp,y,z, bx_xp,by_xp,bz_xp)
+      call sst19_field_vect(TSS,TSO,TSE,
+     .     A_dipsh, A_eq,A_eq_P, A_eq_TCS,A_eq_P_TCS,
+     .     A_R11am,A_R12am,A_R11sm,A_R12sm,
+     .     A_R11a, A_R12a, A_R11s, A_R12s,
+     .     A_R21am,A_R22am,A_R21sm,A_R22sm,
+     .     A_R21a, A_R22a, A_R21s, A_R22s,
+     .     D,DTCS, RH0,G, xKappa1,xKappa2, TW,
+     .     tilt,Pdyn,xm,y,z, bx_xm,by_xm,bz_xm)
+      call sst19_field_vect(TSS,TSO,TSE,
+     .     A_dipsh, A_eq,A_eq_P, A_eq_TCS,A_eq_P_TCS,
+     .     A_R11am,A_R12am,A_R11sm,A_R12sm,
+     .     A_R11a, A_R12a, A_R11s, A_R12s,
+     .     A_R21am,A_R22am,A_R21sm,A_R22sm,
+     .     A_R21a, A_R22a, A_R21s, A_R22s,
+     .     D,DTCS, RH0,G, xKappa1,xKappa2, TW,
+     .     tilt,Pdyn,x,yp,z, bx_yp,by_yp,bz_yp)
+      call sst19_field_vect(TSS,TSO,TSE,
+     .     A_dipsh, A_eq,A_eq_P, A_eq_TCS,A_eq_P_TCS,
+     .     A_R11am,A_R12am,A_R11sm,A_R12sm,
+     .     A_R11a, A_R12a, A_R11s, A_R12s,
+     .     A_R21am,A_R22am,A_R21sm,A_R22sm,
+     .     A_R21a, A_R22a, A_R21s, A_R22s,
+     .     D,DTCS, RH0,G, xKappa1,xKappa2, TW,
+     .     tilt,Pdyn,x,ym,z, bx_ym,by_ym,bz_ym)
+      call sst19_field_vect(TSS,TSO,TSE,
+     .     A_dipsh, A_eq,A_eq_P, A_eq_TCS,A_eq_P_TCS,
+     .     A_R11am,A_R12am,A_R11sm,A_R12sm,
+     .     A_R11a, A_R12a, A_R11s, A_R12s,
+     .     A_R21am,A_R22am,A_R21sm,A_R22sm,
+     .     A_R21a, A_R22a, A_R21s, A_R22s,
+     .     D,DTCS, RH0,G, xKappa1,xKappa2, TW,
+     .     tilt,Pdyn,x,y,zp, bx_zp,by_zp,bz_zp)
+      call sst19_field_vect(TSS,TSO,TSE,
+     .     A_dipsh, A_eq,A_eq_P, A_eq_TCS,A_eq_P_TCS,
+     .     A_R11am,A_R12am,A_R11sm,A_R12sm,
+     .     A_R11a, A_R12a, A_R11s, A_R12s,
+     .     A_R21am,A_R22am,A_R21sm,A_R22sm,
+     .     A_R21a, A_R22a, A_R21s, A_R22s,
+     .     D,DTCS, RH0,G, xKappa1,xKappa2, TW,
+     .     tilt,Pdyn,x,y,zm, bx_zm,by_zm,bz_zm)
+
+c     now compute the finite difference curl and convert to nA/m^2
+      jx = Acurr*( (bz_yp-bz_ym) - (by_zp-by_zm) )
+      jy = Acurr*( (bx_zp-bx_zm) - (bz_xp-bz_xm) )
+      jz = Acurr*( (by_xp-by_xm) - (bx_yp-bx_ym) )
+      
+      return
+      
+      end
+
+      
+      subroutine sst19_field_vect(TSS,TSO,TSE,
+     .     A_dipsh, A_eq,A_eq_P, A_eq_TCS,A_eq_P_TCS,
+     .     A_R11am,A_R12am,A_R11sm,A_R12sm,
+     .     A_R11a, A_R12a, A_R11s, A_R12s,
+     .     A_R21am,A_R22am,A_R21sm,A_R22sm,
+     .     A_R21a, A_R22a, A_R21s, A_R22s,
+     .     D,DTCS, RH0,G, xKappa1,xKappa2, TW,
+     .     tilt,Pdyn,X,Y,Z,
+     .     BX,BY,BZ)
+
+      IMPLICIT  NONE
+
+C     Constants
+      INTEGER    Mend,Nend
+      PARAMETER (Mend = 6)
+      PARAMETER (Nend = 8)
+
+C     Inputs      
+      REAL*8 TSS(80,Nend)
+      REAL*8 TSO(80,Mend,Nend)
+      REAL*8 TSE(80,Mend,Nend)
+      REAL*8 A_dipsh
+      REAL*8 A_eq(Nend+2*Mend*Nend)
+      REAL*8 A_eq_P(Nend+2*Mend*Nend)
+      REAL*8 A_eq_TCS(Nend+2*Mend*Nend)
+      REAL*8 A_eq_P_TCS(Nend+2*Mend*Nend)
+      REAL*8 A_R11am,A_R12am,A_R11sm,A_R12sm
+      REAL*8 A_R11a, A_R12a, A_R11s, A_R12s
+      REAL*8 A_R21am,A_R22am,A_R21sm,A_R22sm
+      REAL*8 A_R21a, A_R22a, A_R21s, A_R22s
+      REAL*8 D,DTCS             ! TAIL SHEET THICKNESS
+      REAL*8 RH0,G
+      REAL*8 xKappa1,xKappa2    !  SCALING FACTORS FOR BIRKELAND CURRENTS
+      REAL*8 TW
+      REAL*8 tilt,Pdyn
+      REAL*8 X,Y,Z
+
+C     Outputs
+      REAL*8  BX,BY,BZ
+      
+c     Internal variables
+      REAL*8  BXCF,BYCF,BZCF
+      REAL*8  BXTS1(Nend),BXTO1(Mend,Nend),BXTE1(Mend,Nend)
+      REAL*8  BYTS1(Nend),BYTO1(Mend,Nend),BYTE1(Mend,Nend)
+      REAL*8  BZTS1(Nend),BZTO1(Mend,Nend),BZTE1(Mend,Nend)
+      REAL*8  BXTS2(Nend),BXTO2(Mend,Nend),BXTE2(Mend,Nend)
+      REAL*8  BYTS2(Nend),BYTO2(Mend,Nend),BYTE2(Mend,Nend)
+      REAL*8  BZTS2(Nend),BZTO2(Mend,Nend),BZTE2(Mend,Nend)
+      REAL*8  BX11am,BY11am,BZ11am
+      REAL*8  BX12am,BY12am,BZ12am
+      REAL*8  BX11sm,BY11sm,BZ11sm
+      REAL*8  BX12sm,BY12sm,BZ12sm
+      REAL*8  BX11a,BY11a,BZ11a
+      REAL*8  BX12a,BY12a,BZ12a
+      REAL*8  BX11s,BY11s,BZ11s
+      REAL*8  BX12s,BY12s,BZ12s
+      REAL*8  BX21am,BY21am,BZ21am
+      REAL*8  BX22am,BY22am,BZ22am
+      REAL*8  BX21sm,BY21sm,BZ21sm
+      REAL*8  BX22sm,BY22sm,BZ22sm
+      REAL*8  BX21a,BY21a,BZ21a
+      REAL*8  BX22a,BY22a,BZ22a
+      REAL*8  BX21s,BY21s,BZ21s
+      REAL*8  BX22s,BY22s,BZ22s
+
       call sst19_field_expansion(TSS,TSO,TSE,
      .     A_dipsh, A_eq,A_eq_P, A_eq_TCS,A_eq_P_TCS,
      .     A_R11am,A_R12am,A_R11sm,A_R12sm,
@@ -207,12 +367,11 @@ c     check that the time-variable variables were loaded
      .     BX21s,BY21s,BZ21s,
      .     BX22s,BY22s,BZ22s,
      .     BX,BY,BZ)
-      
-      return
-      
-      end
-      
 
+      return
+      end
+
+      
       subroutine sst19_field_expansion(TSS,TSO,TSE,
      .     A_dipsh, A_eq,A_eq_P, A_eq_TCS,A_eq_P_TCS,
      .     A_R11am,A_R12am,A_R11sm,A_R12sm,
@@ -241,13 +400,7 @@ c     check that the time-variable variables were loaded
      .     BX21s,BY21s,BZ21s,
      .     BX22s,BY22s,BZ22s,
      .     BX,BY,BZ)
-C
-C   IOPGEN - GENERAL OPTION FLAG:  IOPGEN=0 - CALCULATE TOTAL FIELD
-C                                  IOPGEN=1 - DIPOLE SHIELDING ONLY
-C                                  IOPGEN=2 - TAIL FIELD ONLY
-C                                  IOPGEN=3 - BIRKELAND FIELD ONLY
-C                                  IOPGEN=4 - RING CURRENT FIELD ONLY
-C      
+
       IMPLICIT  NONE
 
 C     Constants
