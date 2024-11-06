@@ -517,10 +517,11 @@ C
 
 C --- New tail structure -------------
 
+c     evaluate the Pdyn function
       P_factor=DSQRT(Pdyn/Pdyn_0)-1.d0
 
+c     these loops evaluate the magnetic field from the thicker plasma sheet
       ind=1
-      
       DO n=1,Nend
          
          coeff=A_eq(ind)+A_eq_P(ind)*P_factor
@@ -553,8 +554,8 @@ C --- New tail structure -------------
          ENDDO
       ENDDO
 
+c     these loops evaluate the magnetic field from the TCS
       ind=1
-      
       DO n=1,Nend
          
          coeff=A_eq_TCS(ind)+A_eq_P_TCS(ind)*P_factor
@@ -587,6 +588,7 @@ C --- New tail structure -------------
          ENDDO
       ENDDO
 
+c     evaluates the magnetic field from the FAC
       bFacX=A_R11am*BX11am+A_R12am*BX12am+A_R11sm*BX11sm+A_R12sm*BX12sm+
      .      A_R11a *BX11a +A_R12a *BX12a +A_R11s *BX11s +A_R12s *BX12s +
      .      A_R21am*BX21am+A_R22am*BX22am+A_R21sm*BX21sm+A_R22sm*BX22sm+
