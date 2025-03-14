@@ -6,9 +6,9 @@ Source code for ARGUS (AI-based Reconstruction of the Geospace Unified System). 
 # About
 
 # Getting Started
-The model source code is self-contained, meaning it requires no external dependencies or libraries. The model was developed on a Mac using [GFortran](https://gcc.gnu.org/wiki/GFortran).
+The model source code is self-contained, requiring no external dependencies or libraries. The model was developed on a Mac using [GFortran](https://gcc.gnu.org/wiki/GFortran).
 
-To get started, try compiling the sample program, sst19_example_june2023.for, included in the source code. First, on the command line move into the directory where the SST19 model code is located: `cd src/sst19`.
+To get started, try compiling the sample program, sst19_example_june2023.for, included in the source code. First, on the command line, move into the directory where the SST19 model code is located: `cd src/sst19`.
 
 Assuming GFortran is [installed](https://gcc.gnu.org/wiki/GFortranBinaries), the sample program can be compiled using the following: 
 `gfortran sst19_example_june2023.for sst19_field.f read_sst19.f fac_total_sst19.f ../deformedsheet_with_tcs.f ../dipoleshield.f ../fac_field.f ../fac_shield.f ../deformbirkfield.f ../stretchfield.f ../one_cone.f ../one_cone_smooth.f ../conical.f90 ../tailsheet_shielded.f ../tailsheet_sym.f ../tailsheet_asym.f ../bendfield.f ../warpfield.f ../cartharmonic.f ../cartharmonic_alt.f ../cylharmonic.f ../rotate_about_y.f ../bessjj.f -o sst19_example_june2023`
