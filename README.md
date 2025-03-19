@@ -33,7 +33,7 @@ This will compile the example program contained in the file `ts07d_example_june2
 
 The executable can then be run on Unix systems using `./ts07d_example_june2023update`.
 
-The TS07D model input files have been precomputed for 1995--2018 which are available on [Zenodo](https://doi.org//10.5281/zenodo.14733740).
+The TS07D model input files have been precomputed for 1995–2018 which are available on [Zenodo](https://doi.org//10.5281/zenodo.14733740).
 
 # FAQs
 None as of yet.
